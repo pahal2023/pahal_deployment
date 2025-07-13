@@ -9,7 +9,7 @@ from .models import Student, Volunteer, Task
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=150, widget=forms.TextInput())
     password = forms.CharField(widget=forms.PasswordInput())
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
+    # captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
 
 class Admission(forms.ModelForm):
     class Meta:
