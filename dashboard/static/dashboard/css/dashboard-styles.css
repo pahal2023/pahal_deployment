@@ -1,0 +1,139 @@
+/* Add a max-height of 0 and overflow-hidden for smooth collapse */
+.overflow-hidden.transition-all {
+    max-height: 0;
+}
+
+/* Override Tailwind's hidden class for the transition */
+.hidden.transition-all {
+    display: block;
+    /* Keep it block for transition to work */
+    max-height: 0;
+    overflow: hidden;
+}
+
+/* Force max-height to auto when not hidden */
+.transition-all:not(.hidden) {
+    max-height: 500px;
+    /* Adjust as needed for the tallest menu */
+}
+
+body.sidebar-open main {
+    margin-left: 256px;
+    /* Adjust to the width of your sidebar (64px * 4) */
+    transition: margin-left 0.3s ease-in-out;
+}
+
+body.sidebar-open #toggle-menu {
+    left: 268px;
+    /* Adjust to position the toggle button when sidebar is open */
+}
+
+#toggle-menu {
+    transition: left 0.3s ease-in-out;
+}
+
+/* Enhanced smooth transitions and modern effects */
+.dropdown-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+}
+
+.dropdown-menu.show {
+    max-height: 500px;
+    opacity: 1;
+}
+
+.nav-item {
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.nav-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    transition: width 0.3s ease;
+    z-index: 1;
+}
+
+.nav-item:hover::before {
+    width: 100%;
+}
+
+.nav-item>* {
+    position: relative;
+    z-index: 2;
+}
+
+.dropdown-arrow {
+    transition: transform 0.3s ease;
+}
+
+.dropdown-arrow.rotated {
+    transform: rotate(180deg);
+}
+
+.sidebar-bg {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.submenu-item {
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.submenu-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateX(2px);
+}
+
+.submenu-item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background: #fbbf24;
+    transition: height 0.2s ease;
+    border-radius: 2px;
+}
+
+.submenu-item:hover::after {
+    height: 60%;
+}
+
+/* Mobile responsive adjustments */
+body.sidebar-open main {
+    margin-left: 256px;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+body.sidebar-open #toggle-menu {
+    left: 268px;
+}
+
+#toggle-menu {
+    transition: left 0.3s ease-in-out;
+}
+
+/* Glassmorphism effect for mobile header */
+.glass-header {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}

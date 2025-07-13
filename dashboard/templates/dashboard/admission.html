@@ -1,0 +1,102 @@
+{% extends 'dashboard/base.html' %}Add commentMore actions
+{% block body %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'dashboard/css/admission-form.css' %}">
+
+<div class="title">
+        <h2 class="title">Student Admission Form</h2>
+</div>
+<div class="form-container">
+
+    <div>
+      {% if messages %}
+      <div>
+        {% for message in messages %}
+        <div class="p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <form enctype="multipart/form-data" method="post" id="student_form">
+        {% csrf_token %}
+
+        <div>
+            <label for="id_name">Student Name</label>
+            <input type="text" name="name" maxlength="40" id="id_name" required>
+
+            <label for="id_age">Age</label>
+            <input type="number" name="age" id="id_age" required>
+        </div>
+
+        <div>
+            <label for="id_gender">Gender</label>
+            <select name="gender" id="id_gender" required>
+                <option value="">Select gender</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="admission_date">Date of Admission</label>
+            <input type="date" id="admission_date" name="date" required>
+        </div>
+
+        <label for="id_photo">Upload Photo</label>
+        <input type="file" name="photo" accept="image/*" aria-invalid="true" id="id_photo" required
+         class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+        <p class="mt-1 text-xs text-gray-500">JPEG or PNG only, max 5MB</p>
+
+        <div>
+            <label for="id_parents_name">Parent/Guardian Name</label>
+            <input type="text" name="parents_name" maxlength="40" id="id_parents_name" required>
+
+            <label for="id_phone_no">Contact Number</label>
+            <input type="text" name="phone_no" maxlength="12" id="id_phone_no" pattern="[0-9]{10}" placeholder="10 digit number" required>
+        </div>
+
+        <label for="id_address">Residential Address</label>
+        <textarea name="address" maxlength="40" id="id_address"></textarea>
+
+        <div>
+            <label for="id_grade">Class/Grade</label>
+            <input type="text" name="grade" maxlength="10" id="id_grade">
+
+            <label for="id_prev_school">Previous School (if any)</label>
+            <input type="text" name="prev_school" maxlength="30" id="id_prev_school">
+        </div>
+
+        <button type="submit" id="saveButton" class="submit-btn">
+            <span id="saveText">Submit Admission Form</span>
+        </button>
+    </form>
+</div>
+
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 text-center shadow-2xl max-w-sm w-full">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <p class="text-gray-800 text-lg font-semibold">Saving Student Information...</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">Processing Admission</h3>
+        <p class="text-gray-600 text-sm">Please wait while we save student information...</p>
+    </div>
+</div>
+
+<script>
+    // Form submission with loading state
+    document.getElementById('student_form').addEventListener('submit', function(e) {
+        const saveButton = document.getElementById('saveButton');
+        const saveText = document.getElementById('saveText');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // Show loading state
+        saveButton.disabled = true;
+        saveText.textContent = 'Saving...';
+        loadingOverlay.classList.remove('hidden');
+    });
+</script>
+
+{% endblock body %}

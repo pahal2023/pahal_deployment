@@ -1,0 +1,76 @@
+{% extends 'dashboard/base.html' %}
+{% block body %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'dashboard/css/admission-form.css' %}">
+<div>
+    <h2 class="title">Volunteer Registration Form</h2>
+</div>
+<div class="form-container">
+    <div>
+        {% if messages %}
+        <div>
+            {% for message in messages %}
+            <div class="p-4 rounded-md {% if message.tags == 'error' %}bg-red-50 text-red-800{% else %}bg-blue-50 text-blue-800{% endif %}">
+            {{ message }}
+        </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    <form enctype="multipart/form-data" method="post" id="volunteer_form">
+        {% csrf_token %}
+        <label for="Reg_no">Registration Number</label>
+        <input type="text" id="Reg_no" name="Reg_no" required>
+
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">College Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" name="phone_no" pattern="[0-9]{10}" required>
+
+        <label for="designation">Designation (e.g. Teacher, Media Team, Management Team)</label>
+        <input type="text" id="designation" name="designation" required>
+
+        <label for="photo">Upload Photo</label>
+        <input type="file" id="photo" name="photo" accept="image/*" required
+         class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+
+        <label for="interest">Area of Interest</label>
+        <input type="text" id="interest" name="interest" placeholder="e.g. Teaching, Fundraising, Event Management" required>
+
+        <label for="experience">Past Volunteering Experience (if any)</label>
+        <textarea id="experience" name="experience" rows="3"></textarea>
+
+        <button id="saveButton" class="submit-btn" type="submit">
+            <span id="saveText">Submit Volunteer Form</span>
+        </button>
+    </form>
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 text-center shadow-2xl max-w-sm w-full">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <h3 class="text-lg font-medium text-gray-900 mb-1">Submitting Your Application</h3>
+        <p class="text-gray-600 text-sm">Please wait while we save your information...</p>
+    </div>
+</div>
+
+<script>
+    // Form submission with loading state
+    document.getElementById('volunteer_form').addEventListener('submit', function(e) {
+        const saveButton = document.getElementById('saveButton');
+        const saveText = document.getElementById('saveText');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // Show loading state
+        saveButton.disabled = true;
+        saveText.textContent = 'Submitting...';
+        loadingOverlay.classList.remove('hidden');
+    });
+</script>
+
+{% endblock body %}

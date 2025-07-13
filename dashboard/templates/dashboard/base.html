@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+    {% load group_tags %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="{% static 'dashboard/css/min-tailwind.css' %}">
+
+    <link rel="icon" href="{% static 'dashboard/icon/favicon.ico' %}" type="image/x-icon">
+
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard-styles.css' %}">
+
+    <title>Admin Panel</title>
+   
+</head>
+
+<body class="bg-gray-100 text-gray-800 font-sans">
+<header
+        class="glass-header shadow px-4 py-2 flex items-center justify-between fixed top-0 left-0 w-full z-50 lg:hidden text-gray-800">
+        <button id="toggle-menu" class="bg-indigo-600 text-white p-2 rounded-md shadow-lg">
+            <i class="fa fa-bars"></i>
+        </button>
+        <div class="flex-grow ml-2 font-semibold">
+            Pahal Foundation
+        </div>
+    </header>
+
+     <header id="desktop-header" class="sidebar-bg shadow-lg px-10 py-3 hidden lg:flex items-center justify-between z-50 text-white ">
+        <div class="flex items-center space-x-4">
+            <span class="text-2xl font-medium tracking-tight text-white-200">
+                Pahal Foundation
+            </span>
+           
+        </div>
+
+        <div class="text-white opacity-80">
+            Welcome, Volunteer
+        </div>
+    </header>
+
+    <div class="flex">
+        <aside id="side-menu" 
+    class="sidebar-bg text-white w-64 space-y-2 py-6 px-4 
+           absolute lg:relative left-0 
+           transform -translate-x-full lg:translate-x-0 
+           transition-transform duration-300 ease-out 
+           z-40 lg:z-auto shadow-2xl
+           top-14 lg:top-0 h-screen max-h-[calc(100vh-3.5rem)] lg:max-h-full">
+            <div id="mainNavLinks" class="space-y-2">
+                <!-- Dashboard Section -->
+                <div>
+                    <div onclick="toggleDropdown('dashboardMenu')"
+                        class="nav-item cursor-pointer flex items-center justify-between p-3 rounded-lg hover:bg-white/10">
+                        <span class="flex items-center font-medium">
+                            <i class="fa fa-home mr-3 text-lg"></i> Dashboard
+                        </span>
+                        <i class="fa fa-chevron-down dropdown-arrow text-sm" id="dashboardArrow"></i>
+                    </div>
+                    <div id="dashboardMenu" class="dropdown-menu ml-4 mt-2 space-y-1">
+                        <a href="/dashboard/profile" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Overview">
+                            <i class="fa fa-user mr-3"></i> Overview
+                        </a>
+                        <a href="/dashboard/timetable" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Time Table">
+                            <i class="fa fa-calendar-alt mr-3"></i> Time Table
+                        </a>
+                        <a href="/dashboard/tasks" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Today Tasks">
+                            <i class="fa fa-tasks mr-3"></i> Assigned Tasks
+                        </a>
+                    </div>
+                </div>
+
+                {% if user|has_group:"admin" or user|has_group:"teacher" %}
+                <!-- Students Section -->
+                <div>
+                    <div onclick="toggleDropdown('studentsMenu')"
+                        class="nav-item cursor-pointer flex items-center justify-between p-3 rounded-lg hover:bg-white/10">
+                        <span class="flex items-center font-medium">
+                            <i class="fa fa-user-graduate mr-3 text-lg"></i> Students
+                        </span>
+                        <i class="fa fa-chevron-down dropdown-arrow text-sm" id="studentsArrow"></i>
+                    </div>
+                    <div id="studentsMenu" class="dropdown-menu ml-4 mt-2 space-y-1">
+                        <a href="/dashboard/student-info" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Students Info">
+                            <i class="fa fa-info-circle mr-3"></i> Students Info
+                        </a>
+                        <a href="/dashboard/attendance" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Attendance">
+                            <i class="fa fa-check-square mr-3"></i> Attendance
+                        </a>
+                        <a href="/error404" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Performance">
+                            <i class="fa fa-chart-line mr-3"></i> Performance
+                        </a>
+                        <a href="/dashboard/admission" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Admissions">
+                            <i class="fa fa-user-plus mr-3"></i> Student Admission 
+                        </a>
+                    </div>
+                </div>
+
+                {% endif %}
+
+                {% if user|has_group:"admin" or user|has_group:"teacher" %}
+                <!-- Volunteers Section -->
+                <div>
+                    <div onclick="toggleDropdown('volunteersMenu')"
+                        class="nav-item cursor-pointer flex items-center justify-between p-3 rounded-lg hover:bg-white/10">
+                        <span class="flex items-center font-medium">
+                            <i class="fa fa-hands-helping mr-3 text-lg"></i> Volunteers
+                        </span>
+                        <i class="fa fa-chevron-down dropdown-arrow text-sm" id="volunteersArrow"></i>
+                    </div>
+                    <div id="volunteersMenu" class="dropdown-menu ml-4 mt-2 space-y-1">
+                        <a href="/dashboard/volunteer-info" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Volunteer Info">
+                            <i class="fa fa-id-card mr-3"></i> Volunteer Information
+                        </a>
+                        
+                        {% if user|has_group:"admin" %}
+                        <a href="/dashboard/volunteer-enrolment" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Enrollments">
+                            <i class="fa fa-clipboard-list mr-3"></i> Enrollment form
+                        </a>
+                        <a href="/dashboard/applicants" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Enrollments">
+                            <i class="fa fa-user-check mr-3"></i> Applicants
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if user|has_group:"admin" or user|has_group:"teacher" %}
+                <!-- Reports Section -->
+                <div>
+                    <div onclick="toggleDropdown('reportsMenu')"
+                        class="nav-item cursor-pointer flex items-center justify-between p-3 rounded-lg hover:bg-white/10">
+                        <span class="flex items-center font-medium">
+                            <i class="fa fa-chart-bar mr-3 text-lg"></i> Reports
+                        </span>
+                        <i class="fa fa-chevron-down dropdown-arrow text-sm" id="reportsArrow"></i>
+                    </div>
+                    <div id="reportsMenu" class="dropdown-menu ml-4 mt-2 space-y-1">
+                        <a href="/error404" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Attendance Analysis">
+                            <i class="fa fa-line-chart mr-3"></i> Attendance Analysis
+                        </a>
+                        <a href="/error404" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Progress Report">
+                            <i class="fa fa-file-alt mr-3"></i> Progress Report
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if user|has_group:"admin" %}
+                <!-- Admin Section -->
+                <div>
+                    <div onclick="toggleDropdown('adminMenu')"
+                        class="nav-item cursor-pointer flex items-center justify-between p-3 rounded-lg hover:bg-white/10">
+                        <span class="flex items-center font-medium">
+                            <i class="fa fa-user-shield mr-3 text-lg"></i> Admin
+                        </span>
+                        <i class="fa fa-chevron-down dropdown-arrow text-sm" id="adminArrow"></i>
+                    </div>
+                    <div id="adminMenu" class="dropdown-menu ml-4 mt-2 space-y-1">
+                        <a href="/dashboard/add-tasks" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Add Tasks">
+                            <i class="fa fa-plus-circle mr-3"></i> Add Tasks
+                        </a>
+                        <a href="/dashboard/volunteers-permission" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Volunteer Permissions">
+                            <i class="fa fa-key mr-3"></i> Volunteer Permissions
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- Settings Section -->
+                <div>
+                    <div onclick="toggleDropdown('settingsMenu')"
+                        class="nav-item cursor-pointer flex items-center justify-between p-3 rounded-lg hover:bg-white/10">
+                        <span class="flex items-center font-medium">
+                            <i class="fa fa-cogs mr-3 text-lg"></i> Settings
+                        </span>
+                        <i class="fa fa-chevron-down dropdown-arrow text-sm" id="settingsArrow"></i>
+                    </div>
+                    <div id="settingsMenu" class="dropdown-menu ml-4 mt-2 space-y-1">
+                        <a href="/error404" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="General Settings">
+                            <i class="fa fa-wrench mr-3"></i> General
+                        </a>
+                        <a href="/change_password" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Change Password">
+                            <i class="fa fa-lock mr-3"></i> Change Password
+                        </a>
+                        <a href="/logout" class="submenu-item block py-2 px-4 rounded-md text-sm"
+                            data-nav-label="Logout">
+                            <i class="fa fa-sign-out-alt mr-3"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-4 lg:p-8 pt-16 lg:pt-8 overflow-y-auto"> {# Changed div to main for semantic HTML #}
+            {% block body %}
+
+            {% endblock body %}
+        </main>
+    </div>
+    <footer class="sidebar-bg text-white-200 py-0.5 px-8 text-sm text-center">
+        <p>&copy; 2025 Pahal Foundation. All rights reserved.</p>
+    </footer>
+    <script src="{% static 'dashboard/js/base.js' %}"></script>
+
+</body>
+
+</html>

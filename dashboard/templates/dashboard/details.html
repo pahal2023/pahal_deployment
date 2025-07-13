@@ -1,0 +1,94 @@
+{% extends "dashboard/base.html" %}
+{% block body %}
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-sm border border-gray-100">
+    <div class="flex justify-between items-start mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Volunteer Application Details</h2>
+            <p class="text-sm text-gray-500 mt-1">Application #{{ volunteer.Reg_no }}</p>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-medium 
+            {% if volunteer.status == 'pending' %}bg-yellow-100 text-yellow-800
+            {% elif volunteer.status == 'approved' %}bg-green-100 text-green-800
+            {% else %}bg-red-100 text-red-800{% endif %}">
+            {{ volunteer.status|title }}
+        </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="space-y-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="text-sm font-medium text-gray-500 mb-3">PERSONAL INFORMATION</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-xs text-gray-400">Full Name</p>
+                        <p class="font-medium">{{ volunteer.name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Email Address</p>
+                        <p class="font-medium">{{ volunteer.email }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Phone Number</p>
+                        <p class="font-medium">{{ volunteer.phone_no }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if volunteer.photo %}
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="text-sm font-medium text-gray-500 mb-3">PHOTO</h3>
+                <img src="{{ volunteer.photo.url }}" alt="Volunteer Photo" 
+                     class="w-32 h-32 object-cover rounded-lg shadow-sm border border-gray-200">
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="space-y-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <h3 class="text-sm font-medium text-gray-500 mb-3">VOLUNTEER DETAILS</h3>
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-xs text-gray-400">Designation</p>
+                        <p class="font-medium">{{ volunteer.designation }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Experience</p>
+                        <p class="font-medium">{{ volunteer.experience }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-400">Areas of Interest</p>
+                        <p class="font-medium">{{ volunteer.interest }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-between items-center border-t pt-6 gap-4">
+        <a href="{% url 'applicant_list' %}" 
+           class="text-gray-600 hover:text-gray-800 flex items-center text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to all applications
+        </a>
+        
+        {% if volunteer.status == 'pending' %}
+        <div class="flex gap-3">
+            <a href="{% url 'reject_applicant' volunteer.Reg_no %}"
+               class="px-4 py-2 border border-red-200 text-red-700 rounded-md hover:bg-red-50 text-sm font-medium transition-colors">
+               Reject Application
+            </a>
+            <a href="{% url 'approve_applicant' volunteer.Reg_no %}"
+               class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm font-medium transition-colors">
+               Approve Application
+            </a>
+        </div>
+        {% else %}
+        <div class="text-sm text-gray-500 italic">
+            This application has been {{ volunteer.status }} on {{ volunteer.updated_at|date:"M d, Y" }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

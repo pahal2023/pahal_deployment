@@ -1,0 +1,102 @@
+{% extends 'dashboard/base.html' %}
+{% block body %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'dashboard/css/info-students.css' %}">
+<div class="container">
+    <div class="header-section">
+        <h1>Student Information</h1>
+        <div class="stats">
+            <span class="student-count">Total Students: {{ students|length }}</span>
+        </div>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="search-section">
+        <input type="text" id="searchInput" placeholder="Search students by name, roll number, or email..." class="search-input">
+    </div>
+    
+    <!-- Student Grid -->
+    <div class="student-grid" id="studentGrid">
+        {% for st in students %}
+        <div class="student-card clickable-card" data-name="{{ st.name|lower }}" data-roll="{{ st.roll_no|lower }}" data-email="{{ st.email|lower }}" onclick="window.location.href=''">
+            <div class="student-photo">
+                {% if st.photo %}
+                    <img src="{{ st.photo.url }}" alt="Photo of {{ st.name }}">
+                {% else %}
+                    <div class="photo-placeholder">
+                        <span>{{ st.name|first }}</span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="student-details">
+
+                {% if st.active == 1 %}
+                <p><span class="status active">Active</span></p>
+                {% else %}
+                <p><span class="status inactive">Inactive</span></p>
+                {% endif %}
+                
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="label">Roll No:</span>
+                        <span class="value">{{ st.roll_no }}</span>
+                    </div>
+
+                    <div class="contact-item">
+                        <span class="label">Name:</span>
+                        <span class="student-name">{{ st.name }}</span>
+                    </div>
+
+                    {% if st.age %}
+                    <div class="contact-item">
+                        <span class="label">Age:</span>
+                        <span class="student-name">{{ st.age }}</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="contact-item">
+                        <span class="label">Parents Name:</span>
+                        <span class="student-name">{{ st.parents_name }}</span>
+                    </div>
+
+                    <div class="contact-item">
+                        <span class="label">Phone:</span>
+                        <a href="tel:{{ st.phone_no }}" class="phone-link">{{ st.phone_no }}</a>
+                    </div>
+                </div>
+                
+                <!-- View Profile Link -->
+                <div class="card-actions">
+                    <span class="view-profile-hint">Click card to view profile</span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-students">
+            <p>No students found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+// Simple search functionality
+document.getElementById('searchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase().trim();
+    const studentCards = document.querySelectorAll('.student-card');
+    
+    studentCards.forEach(card => {
+        const name = card.dataset.name || '';
+        const roll = card.dataset.roll || '';
+        const email = card.dataset.email || '';
+        
+        const isMatch = name.includes(searchTerm) || 
+                       roll.includes(searchTerm) || 
+                       email.includes(searchTerm);
+        
+        card.style.display = isMatch ? 'block' : 'none';
+    });
+});
+</script>
+{% endblock body %}

@@ -1,0 +1,95 @@
+{% extends 'dashboard/base.html' %}
+{% block body %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'dashboard/css/info-volunteers.css' %}">
+<div class="container">
+    <div class="header-section">
+        <h1>Volunteer Information</h1>
+        <div class="stats">
+            <span class="volunteer-count">Total Volunteers: {{ volunteer|length }}</span>
+        </div>
+    </div>
+    
+    <!-- Search Bar -->
+    <div class="search-section">
+        <input type="text" id="searchInput" placeholder="Search volunteers by name, designation, or email..." class="search-input">
+    </div>
+    
+    <!-- Volunteer Grid -->
+    <div class="volunteer-grid" id="volunteerGrid">
+        {% for st in volunteer %}
+        <div class="volunteer-card" data-name="{{ st.name|lower }}" data-designation="{{ st.designation|lower }}" data-email="{{ st.email|lower }}">
+            <div class="volunteer-photo">
+                {% if st.photo %}
+                    <img src="{{ st.photo.url }}" alt="Photo of {{ st.name }}">
+                {% else %}
+                    <div class="photo-placeholder">
+                        <span>{{ st.name|first }}</span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="volunteer-details">
+                <h3 class="volunteer-name">{{ st.name }}</h3>
+                <p class="volunteer-designation">{{ st.designation }}</p>
+                
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="label">ID:</span>
+                        <span class="value">{{ st.Reg_no }}</span>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <span class="label">Email:</span>
+                        <a href="mailto:{{ st.email }}" class="email-link">{{ st.email }}</a>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <span class="label">Phone:</span>
+                        <a href="tel:{{ st.phone_no }}" class="phone-link">{{ st.phone_no }}</a>
+                    </div>
+                    
+                    {% if st.interest %}
+                    <div class="contact-item">
+                        <span class="label">Interest:</span>
+                        <span class="value">{{ st.interest }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if st.experience %}
+                    <div class="contact-item">
+                        <span class="label">Experience:</span>
+                        <span class="value">{{ st.experience }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-volunteers">
+            <p>No volunteers found.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+// Simple search functionality
+document.getElementById('searchInput').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase().trim();
+    const volunteerCards = document.querySelectorAll('.volunteer-card');
+    
+    volunteerCards.forEach(card => {
+        const name = card.dataset.name || '';
+        const designation = card.dataset.designation || '';
+        const email = card.dataset.email || '';
+        
+        const isMatch = name.includes(searchTerm) || 
+                       designation.includes(searchTerm) || 
+                       email.includes(searchTerm);
+        
+        card.style.display = isMatch ? 'block' : 'none';
+    });
+});
+</script>
+{% endblock body %}

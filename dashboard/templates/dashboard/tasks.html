@@ -1,0 +1,218 @@
+{% extends 'dashboard/base.html' %}
+{% block body %}
+{% load static %}
+
+<div class="max-w-4xl mx-auto">
+    <!-- Page Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Today's Tasks</h1>
+                <p class="text-gray-600">View and manage your assigned tasks</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="hidden md:block">
+                    <div class="bg-indigo-50 p-4 rounded-lg">
+                        <i class="fa fa-tasks text-indigo-600 text-2xl"></i>
+                    </div>
+                </div>
+                <!-- Quick Stats -->
+                <div class="hidden sm:flex items-center space-x-4 text-sm">
+                    <div class="text-center">
+                        <div class="text-lg font-semibold text-gray-900">{{ tasks|length }}</div>
+                        <div class="text-gray-500">Total Tasks</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div class="flex flex-col sm:flex-row gap-4 items-center">
+            <div class="relative flex-1">
+                <i class="fa fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="taskSearch" placeholder="Search tasks..." 
+                       class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 w-full">
+            </div>
+            <select id="statusFilter" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="">All Status</option>
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Tasks Container -->
+    <div id="tasksContainer">
+        {% if tasks %}
+            <div class="space-y-4" id="tasksList">
+                {% for task in tasks %}
+                <div class="task-card bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-200" 
+                     data-status="{{ task.status|lower }}" data-deadline="{{ task.deadline }}">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="flex-shrink-0">
+                                    <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                                        <i class="fa fa-clipboard-list text-indigo-600"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Task #{{ forloop.counter }}</h3>
+                                    <p class="text-sm text-gray-500">Assigned to you</p>
+                                </div>
+                            </div>
+                            <!-- Status Badge -->
+                            <span class="status-badge px-3 py-1 rounded-full text-sm font-medium
+                                {% if task.status == 'open' %}bg-green-100 text-green-800
+                                {% elif task.status == 'closed' %}bg-gray-100 text-gray-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                <i class="fa fa-circle mr-1 text-xs"></i>
+                                {{ task.status|title }}
+                            </span>
+                        </div>
+
+                        <!-- Task Content -->
+                        <div class="mb-4">
+                            <div class="prose max-w-none">
+                                <div class="text-gray-700 leading-relaxed">
+                                    {{ task.text|safe }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task Meta Information -->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-100">
+                            <div class="flex items-center space-x-4 text-sm text-gray-500 mb-2 sm:mb-0">
+                                <div class="flex items-center">
+                                    <i class="fa fa-calendar-alt mr-2 text-indigo-600"></i>
+                                    <span class="font-medium">Deadline:</span>
+                                    <span class="ml-1 deadline-date
+                                        {% now 'Y-m-d' as today %}
+                                        {% if task.deadline|date:'Y-m-d' < today %}text-red-600 font-medium
+                                        {% elif task.deadline|date:'Y-m-d' == today %}text-orange-600 font-medium
+                                        {% else %}text-gray-600{% endif %}">
+                                        {{ task.deadline|date:"M d, Y" }}
+                                    </span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fa fa-clock mr-2 text-indigo-600"></i>
+                                    <span class="deadline-indicator
+                                        {% now 'Y-m-d' as today %}
+                                        {% if task.deadline|date:'Y-m-d' < today %}text-red-600 font-medium
+                                        {% elif task.deadline|date:'Y-m-d' == today %}text-orange-600 font-medium
+                                        {% else %}text-green-600{% endif %}">
+                                        {% now 'Y-m-d' as today %}
+                                        {% if task.deadline|date:'Y-m-d' < today %}Overdue
+                                        {% elif task.deadline|date:'Y-m-d' == today %}Due Today
+                                        {% else %}Upcoming{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <div class="max-w-md mx-auto">
+                    <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fa fa-tasks text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">No tasks for today</h3>
+                    <p class="text-gray-500 mb-6">You don't have any tasks assigned for today. Check back later or contact your admin.</p>
+                    <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-sm transition-colors">
+                        <i class="fa fa-refresh mr-2"></i>
+                        Refresh Tasks
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Task card animations */
+.task-card {
+    transition: all 0.2s ease-in-out;
+}
+
+.task-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Status badge styles */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* Deadline indicator styles */
+.deadline-date.text-red-600 {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Search and filter styles */
+#taskSearch:focus,
+#statusFilter:focus {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .task-card {
+        margin-bottom: 1rem;
+    }
+    
+    .flex.space-x-4 {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .flex.space-x-4 > * {
+        margin-right: 0 !important;
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('taskSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const taskCards = document.querySelectorAll('.task-card');
+    
+    function filterTasks() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+        
+        taskCards.forEach(card => {
+            const taskText = card.textContent.toLowerCase();
+            const taskStatus = card.getAttribute('data-status');
+            
+            const matchesSearch = taskText.includes(searchTerm);
+            const matchesStatus = !statusValue || taskStatus === statusValue;
+            
+            if (matchesSearch && matchesStatus) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+    
+    searchInput.addEventListener('input', filterTasks);
+    statusFilter.addEventListener('change', filterTasks);
+});
+</script>
+
+{% endblock body %}

@@ -1,0 +1,15 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% load group_tags %}    
+{% block body %}
+    
+<h2 class="text-2xl font-bold mb-4 text-red-600">Confirm Delete</h2>
+<p>Are you sure you want to delete volunteer <strong>{{ volunteer.name }}</strong> ({{ volunteer.Reg_no }})?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="bg-red-600 text-white px-4 py-2 mt-4 rounded">Yes, Delete</button>
+    <a href="{% url 'all_volunteers' %}" class="ml-4 text-blue-500">Cancel</a>
+</form>
+
+{% endblock body %}

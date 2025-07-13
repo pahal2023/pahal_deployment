@@ -1,0 +1,291 @@
+{% extends "dashboard/base.html"%}
+{% load static %}
+{% load group_tags %}
+{% block body %}
+<style>
+    .form-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .input-field {
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .input-field:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        background: white;
+    }
+
+    .input-readonly {
+        background: #f3f4f6;
+        border: 2px solid #d1d5db;
+        color: #6b7280;
+    }
+
+    .save-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transition: all 0.3s ease;
+    }
+
+    .save-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .photo-container {
+        transition: all 0.3s ease;
+    }
+
+    .photo-container:hover {
+        transform: scale(1.02);
+    }
+</style>
+
+<body class="min-h-screen bg-gradient-to-br from-slate-100 via-blue-50 to-indigo-100">
+    <div class="container mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-800 mb-3 tracking-tight">
+                Edit Volunteer Profile
+            </h1>
+            <p class="text-lg text-gray-600">
+                Update information for <span class="text-indigo-600 font-semibold">{{ volunteer.name }}</span>
+            </p>
+            <div class="w-20 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto mt-4 rounded-full"></div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div id="messages" class="mb-8 max-w-4xl mx-auto">
+                {% for message in messages %}
+                    <div class="bg-white rounded-lg p-4 mb-4 shadow-sm border-l-4 
+                        {% if message.tags == 'success' %}border-green-500{% elif message.tags == 'error' %}border-red-500{% else %}border-blue-500{% endif %}">
+                        <div class="flex items-center">
+                            <span class="text-xl mr-3">
+                                {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% else %}ℹ️{% endif %}
+                            </span>
+                            <span class="text-gray-800 font-medium">{{ message }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Main Form -->
+        <div class="max-w-4xl mx-auto">
+            <div class="form-card rounded-2xl p-8 shadow-lg">
+                <form id="volunteerForm" method="POST" enctype="multipart/form-data" class="space-y-8">
+                    {% csrf_token %}
+                    
+                    <!-- Photo Section -->
+                    <div class="text-center mb-8">
+                        <div class="relative inline-block">
+                            <div class="photo-container w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-white shadow-lg">
+                                {% if volunteer.photo %}
+                                    <img id="photoPreview" src="{{ volunteer.photo.url }}" alt="Profile Photo" class="w-full h-full object-cover">
+                                {% else %}
+                                    <div id="photoPlaceholder" class="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                                        <span class="text-white text-4xl font-bold">{{ volunteer.name|first|upper }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <label for="photo" class="absolute bottom-0 right-0 bg-white rounded-full p-3 shadow-lg cursor-pointer hover:bg-gray-50 transition-colors border-2 border-white">
+                                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </label>
+                            <input type="file" id="photo" name="photo" accept="image/*" class="hidden">
+                        </div>
+                        <p class="text-gray-500 text-sm mt-3 font-medium">Click the camera icon to change photo</p>
+                    </div>
+
+                    <!-- Form Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Left Column -->
+                        <div class="space-y-6">
+                            <!-- Registration Number (Read-only) -->
+                            <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-3">Registration Number</label>
+                                <input type="text" value="{{ volunteer.Reg_no }}" readonly 
+                                    class="input-readonly w-full px-4 py-3 rounded-lg text-gray-600 cursor-not-allowed font-medium">
+                            </div>
+
+                            <!-- Name -->
+                            <div>
+                                <label for="name" class="block text-sm font-bold text-gray-700 mb-3">Full Name *</label>
+                                <input type="text" id="name" name="name" value="{{ volunteer.name }}" required
+                                    class="input-field w-full px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none font-medium">
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label for="email" class="block text-sm font-bold text-gray-700 mb-3">Email Address *</label>
+                                <input type="email" id="email" name="email" value="{{ volunteer.email }}" required
+                                    class="input-field w-full px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none font-medium">
+                            </div>
+
+                            <!-- Phone -->
+                            <div>
+                                <label for="phone_no" class="block text-sm font-bold text-gray-700 mb-3">Phone Number</label>
+                                <input type="tel" id="phone_no" name="phone_no" value="{{ volunteer.phone_no }}" required
+                                    class="input-field w-full px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none font-medium">
+                            </div>
+
+                            <!-- Group -->
+                            <div>
+                                <label for="id_groups_to" class="block text-sm font-bold text-gray-700 mb-3">Group</label>
+                                <select name="groups" id="id_groups_to" required
+                                        class="input-field w-full px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none font-medium">
+                                    <option value="{{ user_group }}">{{ user_group }}</option>
+                                    {% if user_group == "admin" %}
+                                    <option value="teacher">Teacher</option>
+                                    {% else %}
+                                    <option value="admin">Admin</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="space-y-6">
+                            <!-- Designation -->
+                            <div>
+                                <label for="designation" class="block text-sm font-bold text-gray-700 mb-3">Designation</label>
+                                <input type="text" id="designation" name="designation" value="{{ volunteer.designation }}" required
+                                    class="input-field w-full px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none font-medium">
+                            </div>
+
+                            <!-- Interest -->
+                            <div>
+                                <label for="interest" class="block text-sm font-bold text-gray-700 mb-3">Areas of Interest</label>
+                                <textarea id="interest" name="interest" rows="4"
+                                    class="input-field w-full px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none resize-none font-medium leading-loose">{{ volunteer.interest }}</textarea>
+                            </div>
+
+                            <!-- Experience -->
+                            <div>
+                                <label for="experience" class="block text-sm font-bold text-gray-700 mb-3">Experience</label>
+                                <textarea id="experience" name="experience" rows="4"
+                                    class="input-field w-full px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none resize-none font-medium leading-loose">{{ volunteer.experience }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-center space-x-6 pt-8 border-t border-gray-200">
+                        <button type="button" onclick="window.history.back()" 
+                            class="px-8 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg transition-colors border border-gray-300">
+                            Cancel
+                        </button>
+                        <button type="submit" id="saveButton"
+                            class="save-button px-8 py-3 text-white font-bold rounded-lg flex items-center space-x-2">
+                            <span id="saveText">Save Changes</span>
+                            <svg id="saveIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 text-center shadow-2xl">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p class="text-gray-800 text-lg font-semibold">Updating volunteer profile...</p>
+        </div>
+    </div>
+
+    <script>
+        // Photo preview functionality
+        document.getElementById('photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    let preview = document.getElementById("photoPreview");
+                    let placeholder = document.getElementById("photoPlaceholder");
+
+                    if (preview) {
+                        preview.src = e.target.result;  // Update existing image
+                    } else {
+                        // Replace placeholder only once
+                        placeholder.innerHTML = `<img id="photoPreview" src="${e.target.result}" alt="Profile Photo" class="w-full h-full object-cover">`;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.querySelector('label[for="photo"]').addEventListener("click", (event) => {
+            event.preventDefault(); // Prevent unintended duplicate execution
+            document.getElementById("photo").click();
+        });
+
+        // Form submission with loading state
+        document.getElementById('volunteerForm').addEventListener('submit', function(e) {
+            const saveButton = document.getElementById('saveButton');
+            const saveText = document.getElementById('saveText');
+            const saveIcon = document.getElementById('saveIcon');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Show loading state
+            saveButton.disabled = true;
+            saveText.textContent = 'Saving...';
+            saveIcon.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>';
+            loadingOverlay.classList.remove('hidden');
+        });
+
+        // Auto-hide messages after 5 seconds
+        const messagesDiv = document.getElementById('messages');
+        if (messagesDiv) {
+            setTimeout(() => {
+                messagesDiv.style.opacity = '0';
+                messagesDiv.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    messagesDiv.style.display = 'none';
+                }, 500);
+            }, 5000);
+        }
+
+        // Input validation and real-time feedback
+        const inputs = document.querySelectorAll('input[required]');
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    this.classList.add('border-red-400');
+                    this.classList.remove('border-gray-300');
+                } else {
+                    this.classList.remove('border-red-400');
+                    this.classList.add('border-green-400');
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('border-red-400');
+                    this.classList.add('border-green-400');
+                }
+            });
+        });
+
+        // Email validation
+        const emailInput = document.getElementById('email');
+        emailInput.addEventListener('blur', function() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (this.value && !emailRegex.test(this.value)) {
+                this.classList.add('border-red-400');
+                this.classList.remove('border-green-400');
+            }
+        });
+    </script>
+</body>
+{% endblock body%}

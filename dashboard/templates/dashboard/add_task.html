@@ -1,0 +1,231 @@
+{% extends 'dashboard/base.html' %}
+{% block body %}
+{% load static %}
+{{ form.media }}
+
+<div class="max-w-4xl mx-auto">
+    <!-- Page Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Assign New Task</h1>
+                <p class="text-gray-600">Create and assign tasks to volunteers in your organization</p>
+            </div>
+            <div class="hidden md:block">
+                <div class="bg-indigo-50 p-4 rounded-lg">
+                    <i class="fa fa-tasks text-indigo-600 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="mb-6 space-y-3">
+        {% for message in messages %}
+        <div class="p-4 rounded-lg border-l-4 {% if message.tags == 'error' %}bg-red-50 border-red-400 text-red-700{% elif message.tags == 'success' %}bg-green-50 border-green-400 text-green-700{% else %}bg-blue-50 border-blue-400 text-blue-700{% endif %}">
+            <div class="flex items-center">
+                <i class="fa {% if message.tags == 'error' %}fa-exclamation-triangle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} mr-3"></i>
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Task Form -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fa fa-plus-circle mr-2 text-indigo-600"></i>
+                Task Details
+            </h2>
+        </div>
+        
+        <form enctype="multipart/form-data" method="post" class="p-6">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Left Column -->
+                <div class="space-y-6">
+                    <!-- Assign To Field -->
+                    <div class="form-group">
+                        <label for="id_assignedTo" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fa fa-user mr-2 text-indigo-600"></i>
+                            Assign To
+                        </label>
+                        <div class="relative">
+                            {{form.assignedTo}}
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">Select the volunteer who will be responsible for this task</p>
+                    </div>
+
+                    <!-- Status Field -->
+                    <div class="form-group">
+                        <label for="id_status" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fa fa-toggle-on mr-2 text-indigo-600"></i>
+                            Status
+                        </label>
+                        <select name="status" id="id_status" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                            <option value="">Select Status</option>
+                            <option value="open">Open</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                        <p class="mt-1 text-sm text-gray-500">Set the initial status of the task</p>
+                    </div>
+
+                    <!-- Deadline Field -->
+                    <div class="form-group">
+                        <label for="id_deadline" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fa fa-calendar-alt mr-2 text-indigo-600"></i>
+                            Deadline
+                        </label>
+                        <input type="date" name="deadline" id="id_deadline" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                        <p class="mt-1 text-sm text-gray-500">When should this task be completed?</p>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    <!-- Task Description -->
+                    <div class="form-group">
+                        <label for="id_text" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fa fa-file-text mr-2 text-indigo-600"></i>
+                            Task Description
+                        </label>
+                        <div class="relative">
+                            {{form.text}}
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">Provide detailed instructions for the task</p>
+                    </div>
+
+                    <!-- Priority Indicator (Visual Enhancement) -->
+                    <!-- <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <h3 class="text-sm font-medium text-gray-700 mb-3">
+                            <i class="fa fa-lightbulb mr-2 text-yellow-500"></i>
+                            Task Assignment Tips
+                        </h3>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• Be specific and clear in your task description</li>
+                            <li>• Set realistic deadlines for volunteers</li>
+                            <li>• Include any necessary resources or contacts</li>
+                            <li>• Consider the volunteer's availability</li>
+                        </ul>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="mt-8 pt-6 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                    <button type="button" onclick="window.history.back()" class="w-full sm:w-auto px-6 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-colors flex items-center justify-center">
+                        <i class="fa fa-arrow-left mr-2"></i>
+                        Cancel
+                    </button>
+                    <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-sm font-medium transition-colors flex items-center justify-center">
+                        <i class="fa fa-paper-plane mr-2"></i>
+                        Assign Task
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+<!-- 
+    Recent Tasks Preview (Optional Enhancement) 
+    <div class="mt-6 bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-900 flex items-center">
+                <i class="fa fa-clock mr-2 text-indigo-600"></i>
+                Recent Tasks
+            </h3>
+        </div>
+        <div class="p-4">
+            <p class="text-sm text-gray-500 text-center py-4">
+                Recent task assignments will appear here once you start creating tasks
+            </p>
+        </div>
+    </div> -->
+</div>
+
+<style>
+/* Custom styles for form elements */
+.form-group select,
+.form-group input,
+.form-group textarea {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors;
+}
+
+.form-group textarea {
+    @apply min-h-[120px] resize-vertical;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+    @apply ring-2 ring-indigo-500 border-indigo-500;
+}
+
+/* Custom styling for Django form widgets */
+#id_assignedTo {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors;
+}
+
+#id_text {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors min-h-[120px] resize-vertical;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .container {
+        @apply px-4;
+    }
+    
+    .grid-cols-1.lg\:grid-cols-2 {
+        @apply grid-cols-1;
+    }
+}
+
+/* Animation for form submission */
+form button[type="submit"]:active {
+    @apply transform scale-95;
+}
+
+/* Loading state for submit button */
+form button[type="submit"]:disabled {
+    @apply opacity-50 cursor-not-allowed;
+}
+</style>
+
+<script>
+// Set minimum date to today
+document.getElementById('id_deadline').min = new Date().toISOString().split('T')[0];
+
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    // Add loading state on form submission
+    form.addEventListener('submit', function(e) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>Assigning...';
+        
+        // Re-enable button after 3 seconds (in case of server delay)
+        setTimeout(() => {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fa fa-paper-plane mr-2"></i>Assign Task';
+        }, 3000);
+    });
+    
+    // Auto-resize textarea
+    const textarea = document.getElementById('id_text');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+});
+</script>
+
+{% endblock body %}
