@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from .utils import register, mail_credentials, mail_suspension, mail_removing_suspension
+from .utils import register, mail_credentials, mail_suspension, mail_removing_suspension, mail_assign_task
 from .decorators import allowed_users
 from django.db import transaction
 from .models import Volunteer, Task
@@ -17,8 +17,12 @@ def add_task(request):
     if request.method == 'POST':
         form = AddTask(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, f"Task has been successfully assigned.")
+            form = form.save()
+
+            # sending new task mail
+            volunteer = get_object_or_404(Volunteer, user=form.assignedTo)
+            mail_assign_task(volunteer.name, volunteer.email, form.deadline)
+            messages.success(request, f"Task has been successfully assigned and mailed.")
             return redirect('/dashboard/add-tasks')
         else:
             messages.error(request, "Unable to assign task due to internal service error.")

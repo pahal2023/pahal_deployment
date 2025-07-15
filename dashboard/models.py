@@ -1,6 +1,36 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django_ckeditor_5.fields import CKEditor5Field
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
+
+# image preprocessing
+def img_preprocessing(photo):
+
+    img = Image.open(photo)
+    width, height = img.size
+    if width > height:  # Landscape or square-ish
+        left = (width - height) / 2
+        top = 0
+        right = (width + height) / 2
+        bottom = height
+        img = img.crop((left, top, right, bottom))
+    elif height > width:  # Portrait
+        left = 0
+        top = (height - width) / 2
+        right = width
+        bottom = (height + width) / 2
+        img = img.crop((left, top, right, bottom))
+
+    output_size = (200, 200)
+    img.thumbnail(output_size, Image.LANCZOS)  # Use LANCZOS for high-quality down-sampling.
+
+    output = BytesIO()
+    img.save(output, format='PNG', optimize=True)  # Optimized PNG
+
+    return output
 
 class Student(models.Model):
     roll_no = models.AutoField(primary_key=True)
@@ -15,6 +45,22 @@ class Student(models.Model):
     photo = models.ImageField(upload_to ='students/', null=True)
     grade = models.CharField(max_length=10, blank=True, default='')
     prev_school = models.CharField(max_length=30, blank=True, default='')
+
+    def save(self, *args, **kwargs):
+        if self.pk and Student.objects.filter(pk=self.pk).exists():  # Check if updating an existing instance
+            old = Student.objects.get(pk=self.pk)  # old = old_instance
+            if old.photo and old.photo != self.photo:
+                old.photo.delete(save=False)  # Delete old photo from S3
+            else:
+                super().save(*args, **kwargs)
+
+        output = img_preprocessing(self.photo)
+        self.photo = InMemoryUploadedFile(
+            output, 'ImageField', f"{self.photo.name.split('.')[0]}.png",
+            'image/png', sys.getsizeof(output), None
+        )
+
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.photo:  # Check if there is an image
@@ -75,6 +121,14 @@ class Volunteer(models.Model):
             old = Volunteer.objects.get(pk=self.pk)  # old = old_instance
             if old.photo and old.photo != self.photo:
                 old.photo.delete(save=False)  # Delete old photo from S3
+            else:
+                super().save(*args, **kwargs)
+
+        output = img_preprocessing(self.photo)
+        self.photo = InMemoryUploadedFile(
+            output, 'ImageField', f"{self.photo.name.split('.')[0]}.png",
+            'image/png', sys.getsizeof(output), None
+        )
 
         super().save(*args, **kwargs)  # Save the new photo
 

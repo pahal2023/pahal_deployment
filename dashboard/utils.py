@@ -52,7 +52,7 @@ To get started, you can log in to your volunteer dashboard using the credentials
 Username: {username}
 Password: {password}
 
-Dashboard Link: [Website Link]
+Dashboard Link: https://admin.pahalkids.in/
 
 Please ensure you log in and explore the dashboard for important updates and resources. If you face any issues accessing your account, feel free to reach out.
 Thank you for joining us in our mission to empower underprivileged students. Looking forward to working together!
@@ -94,7 +94,7 @@ Dear {volunteer_name},
 We hope you are doing well.
 
 We are happy to inform you that your volunteer account has been reinstated and is now active again. You can resume accessing the dashboard and contributing to Pahal Foundation’s mission.
-Dashboard Link: [Website Login URL]
+Dashboard Link: https://admin.pahalkids.in/
 
 If you face any issues logging in or need any assistance, please feel free to reach out to the Pahal Foundation coordinators at pahalkids@gmail.com.
 
@@ -103,4 +103,23 @@ Thank you for your commitment, and we look forward to working together again!
 Best regards,
 Pahal Foundation Team
 ''')
+    send_mail(subject, message, from_email, recipient_list)
+
+def mail_assign_task(volunteer_name, email_to, deadline):
+    from_email = "pahalfoundationvitb@gmail.com"
+    recipient_list = [email_to, ]
+    subject = "New Task Assigned To You"
+    message = (f'''
+Dear {volunteer_name},
+We hope you're doing well.
+    
+You’ve just been assigned a new task:
+Please check your dashboard for full details regarding this task.
+🗓️ Deadline: {deadline}
+    
+Your contribution plays a vital role in supporting Pahal Foundation’s mission, and we truly appreciate your efforts. For any questions, feel free to reach out to the coordinators.
+    
+Warm regards,
+Pahal Foundation Team  
+    ''')
     send_mail(subject, message, from_email, recipient_list)

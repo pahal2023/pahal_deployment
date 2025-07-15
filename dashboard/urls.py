@@ -27,7 +27,7 @@ urlpatterns = [
     path('dashboard/volunteer-info/', views2.volunteer_info, name="volunteer_info"),
     path('dashboard/volunteer-enrolment/',views2.volunteer_enrolment,name="volunteer_enrolment"),
 
-    # path('dashboard/report-attendance/', views2.attendance_report, name="attendance_report"),
+    path('dashboard/report-attendance/', views2.attendance_report, name="attendance_report"),
     # path('dashboard/report-progress/', views2.progress_repost, name="progress_report"),
 
 

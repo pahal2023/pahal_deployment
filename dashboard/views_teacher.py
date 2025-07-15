@@ -5,7 +5,9 @@ from django.db import transaction
 from .models import Student, Volunteer, Attendance, Task
 from .forms import Admission, VolunteerEnrolment
 from .decorators import allowed_users
+from django.http import JsonResponse
 from .utils import register
+import datetime
 
 # Create your views here.
 
@@ -39,6 +41,37 @@ def attendance(request):
             messages.error(request, "Unable to save attendance: " + str(e))
 
     return render(request, 'dashboard/attendance.html',{"students":students})
+
+@allowed_users(allowed_roles=['teacher', 'admin'])
+def attendance_report(request):
+    attendance_data = []
+    selected_date = request.GET.get('date')
+
+    if selected_date:
+        selected_date = datetime.datetime.strptime(selected_date, '%Y-%m-%d').date()
+    else:
+        selected_date = datetime.date.today()
+
+    attendances_for_date = Attendance.objects.filter(date=selected_date).select_related('student').order_by(
+        'student__roll_no')
+    for k in attendances_for_date:
+        attendance_data.append({
+            'student_roll_no': k.student.roll_no,
+            'student_name': k.student.name,
+            'status': k.status
+        })
+
+    context = {
+        'attendance_data': attendance_data,
+        'selected_date': selected_date.strftime('%Y-%m-%d'),
+    }
+
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        # This is an AJAX request
+        return JsonResponse(context)
+    else:
+        # This is a regular GET request for the initial page load
+        return render(request, 'dashboard/attendance_report.html', context)
 
 @allowed_users(allowed_roles=['teacher', 'admin'])
 def student_info(request):
