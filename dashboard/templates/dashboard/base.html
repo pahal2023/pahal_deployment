@@ -16,11 +16,23 @@
     <link rel="stylesheet" href="{% static 'dashboard/css/dashboard-styles.css' %}">
 
     <title>Admin Panel</title>
-   
+    <style>
+        /* Custom styles for the sidebar background */
+        .sidebar-bg {
+            background-color: #1f2937; /* A dark gray for the sidebar */
+        }
+        /* Set Inter font for better aesthetics */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 text-gray-800 font-sans">
-<header
+<!-- Added 'min-h-screen flex flex-col' to make the body a flex container
+     that takes at least the full screen height and stacks its children vertically -->
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen flex flex-col">
+    <!-- Mobile Header (fixed to top) -->
+    <header
         class="glass-header shadow px-4 py-2 flex items-center justify-between fixed top-0 left-0 w-full z-50 lg:hidden text-gray-800">
         <button id="toggle-menu" class="bg-indigo-600 text-white p-2 rounded-md shadow-lg">
             <i class="fa fa-bars"></i>
@@ -30,12 +42,12 @@
         </div>
     </header>
 
-     <header id="desktop-header" class="sidebar-bg shadow-lg px-10 py-3 hidden lg:flex items-center justify-between z-50 text-white ">
+    <!-- Desktop Header -->
+    <header id="desktop-header" class="sidebar-bg shadow-lg px-10 py-3 hidden lg:flex items-center justify-between z-50 text-white ">
         <div class="flex items-center space-x-4">
             <span class="text-2xl font-medium tracking-tight text-white-200">
                 Pahal Foundation
             </span>
-           
         </div>
 
         <div class="text-white opacity-80">
@@ -43,14 +55,23 @@
         </div>
     </header>
 
-    <div class="flex">
-        <aside id="side-menu" 
-    class="sidebar-bg text-white w-64 space-y-2 py-6 px-4 
-           absolute lg:relative left-0 
-           transform -translate-x-full lg:translate-x-0 
-           transition-transform duration-300 ease-out 
-           z-40 lg:z-auto shadow-2xl
-           top-14 lg:top-0 h-screen max-h-[calc(100vh-3.5rem)] lg:max-h-full">
+    <!-- Main Content Area (flex-1 makes it grow to fill vertical space) -->
+    <div class="flex flex-1">
+        <!-- Sidebar -->
+       <aside id="side-menu"
+            class="sidebar-bg text-white w-full lg:w-64 space-y-2 py-6 px-4
+                   fixed lg:relative left-0 top-0 min-h-full z-50
+                   transform -translate-x-full lg:translate-x-0
+                   transition-transform duration-300 ease-out
+                   shadow-2xl overflow-y-auto"> <!-- Added overflow-y-auto for long menus -->
+
+            <!-- Mobile-specific header inside the full-screen menu -->
+            <div class="flex items-center justify-between px-4 py-2 mb-4 lg:hidden">
+                <span class="text-xl font-semibold">Pahal Foundation</span>
+                <button id="close-menu" class="text-white text-2xl focus:outline-none">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
             <div id="mainNavLinks" class="space-y-2">
                 <!-- Dashboard Section -->
                 <div>
@@ -213,17 +234,97 @@
             </div>
         </aside>
 
-        <main class="flex-1 p-4 lg:p-8 pt-16 lg:pt-8 overflow-y-auto"> {# Changed div to main for semantic HTML #}
-            {% block body %}
+        <!-- Overlay for mobile menu -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black opacity-50 z-40 hidden lg:hidden"></div>
 
+        <!-- Main Content Area -->
+        <main id = "main"class="flex-1 p-4 lg:p-8 pt-16 lg:pt-8 overflow-y-auto ">
+            {% block body %}
+               
             {% endblock body %}
         </main>
     </div>
-    <footer class="sidebar-bg text-white-200 py-0.5 px-8 text-sm text-center">
+
+    <!-- Footer -->
+    <footer class="sidebar-bg text-white-200 py-1 px-8 text-sm text-center">
         <p>&copy; 2025 Pahal Foundation. All rights reserved.</p>
     </footer>
     <script src="{% static 'dashboard/js/base.js' %}"></script>
+     <script>
+    // JavaScript for mobile menu toggle
+    const closeMenuButton = document.getElementById('close-menu');
+    const menuToggle = document.getElementById('toggle-menu');
+    const mainContent = document.getElementById('main'); // Correctly gets the main element by ID
 
+    // You might also have an overlay, if so, get it here:
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+
+    function openMenu() {
+        sideMenu.classList.remove('-translate-x-full');
+        // Show overlay if it exists
+        if (sidebarOverlay) {
+            sidebarOverlay.classList.remove('hidden'); // Assuming 'hidden' hides it
+            // If you have a fade transition on the overlay, you might want to add 'open' class
+            // sidebarOverlay.classList.add('open');
+        }
+        document.body.classList.add('overflow-hidden'); // Prevent background scrolling
+    }
+
+    function closeMenu() {
+        sideMenu.classList.add('-translate-x-full');
+
+        // Hide overlay if it exists
+        if (sidebarOverlay) {
+            // If overlay has a transition, hide it after a short delay
+            // Otherwise, just hide it immediately
+            setTimeout(() => {
+                sidebarOverlay.classList.add('hidden');
+                // If you added an 'open' class for fade, remove it here
+                // sidebarOverlay.classList.remove('open');
+            }, 300); // Adjust this delay to match your overlay's fade-out duration
+        }
+
+        document.body.classList.remove('overflow-hidden'); // Re-enable background scrolling
+
+        // --- Simulate a click on the main content area ---
+        if (mainContent) {
+            // Give a tiny moment for the CSS transition to complete,
+            // before simulating the click to ensure the DOM is stable.
+            setTimeout(() => {
+                const clickEvent = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                mainContent.dispatchEvent(clickEvent);
+            }, 50); // Small delay, adjust if necessary
+        }
+    }
+
+    menuToggle.addEventListener('click', openMenu);
+    closeMenuButton.addEventListener('click', closeMenu);
+
+    // Add event listener for clicking on the overlay to close the menu
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', closeMenu);
+    }
+
+    // Close sidebar if screen resized to large while open
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) { // lg breakpoint
+            // Ensure the menu is visually reset for desktop
+            sideMenu.classList.remove('-translate-x-full'); // Ensure it's visible on desktop
+
+            // Ensure overlay is hidden on desktop
+            if (sidebarOverlay) {
+                sidebarOverlay.classList.add('hidden');
+                // sidebarOverlay.classList.remove('open'); // If using 'open' class for fade
+            }
+            document.body.classList.remove('overflow-hidden'); // Re-enable background scrolling
+        }
+    });
+</script>
 </body>
 
 </html>
