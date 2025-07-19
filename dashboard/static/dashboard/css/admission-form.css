@@ -1,23 +1,33 @@
 /* This css is used by admission.html, volunteer_enrolment.html, attendance.html */
   .title{
-    text-align: center;
-    color: rgb(31 41 55);
+    color: #1f2937;
     font-size: 1.8rem;
     font-weight: 700;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
   }
   label {
     display: block;
-    margin: 15px 0 5px;
-    color: #333;
+    margin: 18px 0 6px;
+    color: #374151;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 600;
   }
+
   input, select, textarea {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 4px;
+    padding: 12px;
+    margin-bottom: 6px;
+    border: 1px solid #d1d5db; /* Tailwind gray-300 */
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: border-color 0.3s, box-shadow 0.3s;
   }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #6366f1; /* indigo-500 */
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+
   input[type="date"]::-webkit-calendar-picker-indicator{
     background: transparent;
     color: transparent;
@@ -33,31 +43,36 @@
   input[type="date"]{
     position: relative;
   }
-  input[type="date"]:after{
+  input[type="date"]:after {
     content: "📅";
     position: absolute;
-    right: 10px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
     pointer-events: none;
+    font-size: 18px;
   }
   .form-container{
+    background-color: #ffffff;
     max-width: 60rem;
     margin: auto;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    padding: 20px;
   }
+
   .submit-btn {
     background-color: #6976df;
-    color: white;
-    margin-top: 15px;
+    color: #fff;
+    margin-top: 20px;
     border: none;
-    padding: 10px;
-    border-radius: 5px;
+    padding: 12px;
+    border-radius: 6px;
     cursor: pointer;
-    width: 100%;
-    font-size: 20px;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
   }
   .submit-btn:hover {
     background-color: #6f60bf;

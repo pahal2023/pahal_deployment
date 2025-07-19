@@ -3,9 +3,6 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'dashboard/css/admission-form.css' %}">
 
-<div class="title">
-        <h2 class="title">Student Admission Form</h2>
-</div>
 <div class="form-container">
 
     <div>
@@ -20,9 +17,9 @@
       {% endif %}
     </div>
 
+    <h2 class="title">Student Admission Form</h2>
     <form enctype="multipart/form-data" method="post" id="student_form">
         {% csrf_token %}
-
         <div>
             <label for="id_name">Student Name</label>
             <input type="text" name="name" maxlength="40" id="id_name" required>

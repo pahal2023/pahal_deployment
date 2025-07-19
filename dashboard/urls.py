@@ -33,6 +33,7 @@ urlpatterns = [
 
     # views3
     path('dashboard/add-tasks/', views3.add_task, name="add_tasks"),
+    # path('dashboard/general-settings/', views3.general_settings, name="general_settings"),
 
     # Volunteer management
     path('dashboard/volunteers-permission/', views3.all_volunteers, name='all_volunteers'),

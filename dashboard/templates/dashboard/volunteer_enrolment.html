@@ -3,9 +3,10 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'dashboard/css/admission-form.css' %}">
 <div>
-    <h2 class="title">Volunteer Registration Form</h2>
+
 </div>
 <div class="form-container">
+
     <div>
         {% if messages %}
         <div>
@@ -17,6 +18,8 @@
         </div>
         {% endif %}
     </div>
+
+    <h2 class="title">Volunteer Registration Form</h2>
     <form enctype="multipart/form-data" method="post" id="volunteer_form">
         {% csrf_token %}
         <label for="Reg_no">Registration Number</label>

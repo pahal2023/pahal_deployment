@@ -97,14 +97,14 @@ def admission(request):
     return render(request, 'dashboard/admission.html')
 
 # This fun saves all the date to volunteers db and creates registration for new volunteer.
-@allowed_users(allowed_roles=['admin'])
+@allowed_users(allowed_roles=['teacher','admin'])
 def volunteer_enrolment(request):
     if request.method == 'POST':
         form = VolunteerEnrolment(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            # register(form.instance.name, form.instance.email)  # register function is in utils.py
-            return redirect('/dashboard/applicants')
+            messages.success(request, "Applicant information saved successfully, Waiting for approval.")
+            return redirect('/dashboard/volunteer-enrolment')
         else:
             errors = []
             for field, error_list in form.errors.items():

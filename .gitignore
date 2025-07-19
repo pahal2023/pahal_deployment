@@ -3,4 +3,4 @@ __pycache__
 *.venv
 /node_modules
 /myenv
-#PahalFoundation/PahalFoundation/settings.py
+pahalfoundation/.env
