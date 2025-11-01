@@ -2,7 +2,8 @@ from django import forms
 from django_ckeditor_5.widgets import CKEditor5Widget
 from django_recaptcha.fields import ReCaptchaField
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
-from .models import Student, Volunteer, Task
+from .models import Student, Volunteer, Task, Slot
+
 
 # Create your forms here.
 
@@ -17,9 +18,17 @@ class Admission(forms.ModelForm):
         exclude = ['active']
 
 class VolunteerEnrolment(forms.ModelForm):
+    slots = forms.ModelMultipleChoiceField(
+        queryset=Slot.objects.all(),
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'slot-checkbox'}),
+        required=False,
+        label="Available Slots (Select all that apply)"
+    )
+
     class Meta:
         model = Volunteer
-        exclude = ['status', 'user']
+        exclude = ['status', 'user','designation']
+        
 class AddTask(forms.ModelForm):
     class Meta:
         model = Task

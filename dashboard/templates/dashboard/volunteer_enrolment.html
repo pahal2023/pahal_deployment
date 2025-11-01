@@ -2,6 +2,14 @@
 {% block body %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'dashboard/css/admission-form.css' %}">
+<style>
+    .slot-grid input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #4f46e5; /* Indigo */
+}
+
+</style>
 <div>
 
 </div>
@@ -34,18 +42,33 @@
         <label for="phone">Phone Number</label>
         <input type="tel" id="phone" name="phone_no" pattern="[0-9]{10}" required>
 
-        <label for="designation">Designation (e.g. Teacher, Media Team, Management Team)</label>
-        <input type="text" id="designation" name="designation" required>
+
 
         <label for="photo">Upload Photo</label>
         <input type="file" id="photo" name="photo" accept="image/*" required
          class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
 
         <label for="interest">Area of Interest</label>
-        <input type="text" id="interest" name="interest" placeholder="e.g. Teaching, Fundraising, Event Management" required>
+        <input type="text" id="interest" name="interest" placeholder="Media, Content Creation, Tech Team, Other" required>
 
-        <label for="experience">Past Volunteering Experience (if any)</label>
+        <label for="experience">Work done related to your area of interest (Share google drive link with open access)</label>
         <textarea id="experience" name="experience" rows="3"></textarea>
+
+<label for="slots" class="block font-medium text-gray-700 mb-2">
+    Available Slots (Select all that apply)
+</label>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for checkbox in form.slots %}
+        <label class="flex items-center p-3 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-indigo-50 transition cursor-pointer">
+            {{ checkbox.tag }}
+            <span class="ml-2 text-gray-800 text-sm font-medium">
+                {{ checkbox.choice_label }}
+            </span>
+        </label>
+    {% endfor %}
+</div>
+
 
         <button id="saveButton" class="submit-btn" type="submit">
             <span id="saveText">Submit Volunteer Form</span>

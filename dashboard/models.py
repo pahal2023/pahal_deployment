@@ -102,11 +102,32 @@ STATUS_CHOICES = [
     ('rejected', 'Rejected'),
     ('suspended', 'Suspended'),
 ]
+class Slot(models.Model):
+    SLOT_CHOICES = [
+        (1, "Monday (10:00–11:40)"),
+        (2, "Monday (11:40–12:30)"),
+        (3, "Tuesday (10:00–11:40)"),
+        (4, "Tuesday (11:40–12:30)"),
+        (5, "Wednesday (10:00–11:40)"),
+        (6, "Wednesday (11:40–12:30)"),
+        (7, "Thursday (10:00–11:40)"),
+        (8, "Thursday (11:40–12:30)"),
+        (9, "Friday (10:00–11:40)"),
+        (10, "Friday (11:40–12:30"),
+    ]
+    slot_id = models.PositiveSmallIntegerField(choices=SLOT_CHOICES, unique=True)
 
+    def __str__(self):
+        # readable name for admin
+        return dict(self.SLOT_CHOICES).get(self.slot_id, str(self.slot_id))
+
+    class Meta:
+        ordering = ['slot_id']
+    
 class Volunteer(models.Model):
     Reg_no = models.CharField(primary_key=True, max_length=70)
     name = models.CharField(unique=True, null=False, max_length=70)
-    designation = models.CharField(max_length=25)
+    designation = models.CharField(max_length=25, default='Teacher')
     email = models.EmailField(max_length=80)
     phone_no = models.CharField(max_length=12)
     photo = models.ImageField(upload_to ='volunteer/', null=True)
@@ -116,21 +137,33 @@ class Volunteer(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='volunteers')
 
+    slots = models.ManyToManyField(Slot, related_name='volunteers', blank=True)
+
     def save(self, *args, **kwargs):
-        if self.pk and Volunteer.objects.filter(pk=self.pk).exists():  # Check if updating an existing instance
-            old = Volunteer.objects.get(pk=self.pk)  # old = old_instance
+        is_update = self.pk and Volunteer.objects.filter(pk=self.pk).exists()
+    
+        if is_update:
+            old = Volunteer.objects.get(pk=self.pk)
             if old.photo and old.photo != self.photo:
-                old.photo.delete(save=False)  # Delete old photo from S3
-            else:
-                super().save(*args, **kwargs)
+                # Old photo is being replaced, delete the old one
+                old.photo.delete(save=False)
+                # Preprocess the new photo
+                output = img_preprocessing(self.photo)
+                self.photo = InMemoryUploadedFile(
+                    output, 'ImageField', f"{self.photo.name.split('.')[0]}.png",
+                    'image/png', sys.getsizeof(output), None
+                )
+            # else: photo not changed → skip reprocessing
+        else:
+            # New instance → process the image once
+            output = img_preprocessing(self.photo)
+            self.photo = InMemoryUploadedFile(
+                output, 'ImageField', f"{self.photo.name.split('.')[0]}.png",
+                'image/png', sys.getsizeof(output), None
+            )
 
-        output = img_preprocessing(self.photo)
-        self.photo = InMemoryUploadedFile(
-            output, 'ImageField', f"{self.photo.name.split('.')[0]}.png",
-            'image/png', sys.getsizeof(output), None
-        )
+        super().save(*args, **kwargs)
 
-        super().save(*args, **kwargs)  # Save the new photo
 
     def delete(self, *args, **kwargs):
         if self.photo:  # Check if there is an image

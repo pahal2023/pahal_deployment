@@ -96,15 +96,16 @@ def admission(request):
             messages.error(request, "Admission form is showing invalid.")
     return render(request, 'dashboard/admission.html')
 
-# This fun saves all the date to volunteers db and creates registration for new volunteer.
-@allowed_users(allowed_roles=['teacher','admin'])
+@allowed_users(allowed_roles=['admin'])
 def volunteer_enrolment(request):
     if request.method == 'POST':
         form = VolunteerEnrolment(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Applicant information saved successfully, Waiting for approval.")
-            return redirect('/dashboard/volunteer-enrolment')
+            volunteer = form.save(commit=False)
+            volunteer.save()
+            form.save_m2m()  # <-- important for ManyToMany fields
+            messages.success(request, "Volunteer enrolled successfully!")
+            return redirect('/dashboard/applicants')
         else:
             errors = []
             for field, error_list in form.errors.items():
@@ -112,5 +113,8 @@ def volunteer_enrolment(request):
                     errors.append(f"{field}: {error}")
             error_message = " | ".join(errors)
             messages.error(request, f"Volunteer enrolment form errors: {error_message}")
+    else:
+        form = VolunteerEnrolment()
 
-    return render(request, 'dashboard/volunteer_enrolment.html')
+    return render(request, 'dashboard/volunteer_enrolment.html', {'form': form})
+

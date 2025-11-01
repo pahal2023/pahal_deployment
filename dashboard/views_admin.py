@@ -164,5 +164,7 @@ def approve_applicant(request, reg_no):
 @allowed_users(allowed_roles=['admin'])
 def reject_applicant(request, reg_no):
     volunteer = get_object_or_404(Volunteer, Reg_no=reg_no)
-    volunteer.update(status="rejected")
+    volunteer.status = "rejected"
+    volunteer.save()
     return redirect('applicant_list')
+

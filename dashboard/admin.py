@@ -7,3 +7,8 @@ admin.site.register(Attendance)
 admin.site.register(Progress)
 admin.site.register(Volunteer)
 admin.site.register(Task)
+admin.register(Slot)
+
+@admin.register(Slot)
+class SlotAdmin(admin.ModelAdmin):
+    list_display = ('slot_id', '__str__')
